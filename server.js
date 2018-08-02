@@ -9,7 +9,9 @@ var tmp = require('tmp');
 var fs = require('fs');
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
+
 var potrace = require('potrace');
+var autotrace = require('autotrace');
 
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
@@ -47,11 +49,21 @@ app.post('/convertImg', function(req, res){
       var params = {
         threshold: 120
       };
-      potrace.trace(path, function(err, svg){
-        if(err) throw err;
-        console.log(`svg: ${svg}`);
-        // return svg
-        res.send(svg);
+      
+//       // potrace test https://github.com/tooolbox/node-potrace#readme
+//       potrace.trace(path, function(err, svg){
+//         if(err) throw err;
+//         console.log(`svg: ${svg}`);
+//         // return svg
+//         res.send(svg);
+         
+//         cleanupCallback(); 
+//       });
+      
+      // autotrace test https://www.npmjs.com/package/autotrace
+      autotrace(path).outputFormat('svg').stream(function(err, stdout, stderr){
+        console.log(`stdout ${stdout}`);
+        res.send(stdout);
          
         cleanupCallback(); 
       });

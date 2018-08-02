@@ -15,7 +15,8 @@
     "fs": "^0.0.2",
     "body-parser": "^1.18.3",
     "express-fileupload": "^0.4.0",
-    "potrace": "^2.1.1"
+    "potrace": "^2.1.1",
+    "autotrace": "^0.0.2"
   },
   "engines": {
     "node": "8.x"

@@ -34,3 +34,11 @@ function uploadImage(){
   }
   
 }
+
+// ImageTracer.imageToSVG(
+//   'https://cdn.glitch.com/a953a0b7-25df-4ce8-a9fd-541788b8c091%2Fsample.png?1533231943459', 
+//   function(svgstr){
+//     console.log(svgstr),
+//       `posterized2`
+//   }
+//   );

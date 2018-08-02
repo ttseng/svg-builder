@@ -45,10 +45,11 @@ app.post('/convertImg', function(req, res){
       
       // convert to svg
       var params = {
-        
+        threshold: 120
       };
       potrace.trace(path, function(err, svg){
         if(err) throw err;
+        console.log(`svg: ${svg}`);
         // return svg
         res.send(svg);
          

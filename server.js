@@ -62,8 +62,10 @@ app.post('/convertImg', function(req, res){
       
       // autotrace test https://www.npmjs.com/package/autotrace
       autotrace(path).outputFormat('svg').stream(function(err, stdout, stderr){
+        var writeStream = fs.createWriteStream('tmp/out.svg');
+        
         console.log(`stdout ${stdout}`);
-        res.send(stdout);
+        // res.send(stdout);
          
         cleanupCallback(); 
       });

@@ -9,8 +9,7 @@ var tmp = require('tmp');
 var fs = require('fs');
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
-
-var ImageTracer = require('imagetracerjs');
+var potrace = require('potrace');
 
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
@@ -45,14 +44,16 @@ app.post('/convertImg', function(req, res){
       console.log('wrote to file!');
       
       // convert to svg
-      ImageTracer.imageToSVG(path, function(svgstr){
-        console.log(`svgstr: ${svgstr}`);
+      var params = {
+        
+      };
+      potrace.trace(path, function(err, svg){
+        if(err) throw err;
+        // return svg
+        res.send(svg);
+         
+        cleanupCallback(); 
       });
-     
-
-      cleanupCallback();
-      // return font name
-      // res.send(svg);
   });
   });
   }

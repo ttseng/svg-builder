@@ -10,7 +10,8 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "imagetracerjs": "^1.2.4"
   },
   "engines": {
     "node": "8.x"

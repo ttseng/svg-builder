@@ -34,10 +34,23 @@
   
     </header>
 
-    <main>      
-      <input id="imgFile" type="file" name="file" onchange="uploadImage()"/>     
+    <main>   
+      <div class="input">
+        <h3>
+          Input
+        </h3>
+          <input id="imgFile" type="file" name="file" onchange="uploadImage()"/>   
+      </div>  
+      <div class="output">
+        <h3>
+          Output
+        </h3>
+        <h5>
+          Potrace
+        </h5>
+        <div id="potraceOutput"></div>  
+      </div>
       
-      <div id="potrace"></div>
     </main>
 
     <!-- include the Glitch button to show what the webpage is about and

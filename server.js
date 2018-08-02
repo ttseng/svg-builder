@@ -45,7 +45,9 @@ app.post('/convertImg', function(req, res){
       console.log('wrote to file!');
       
       // convert to svg
-      ImageTracer.imageToSVG(path, alert);
+      ImageTracer.imageToSVG(path, function(svgstr){
+        console.log(`svgstr: ${svgstr}`);
+      });
      
 
       cleanupCallback();
@@ -56,6 +58,3 @@ app.post('/convertImg', function(req, res){
   }
   
 });
-
-function alert(){
-}

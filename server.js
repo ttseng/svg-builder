@@ -32,7 +32,7 @@ var listener = app.listen(process.env.PORT, function() {
   console.log('Your app is listening on port ' + listener.address().port);
 });
 
-app.post('/convertImg', function(req, res){
+app.post('/potraceImg', function(req, res){
   if(!req.files) console.log('no files uploaded')
   else{
     let imgFile = req.files.file;
@@ -51,23 +51,23 @@ app.post('/convertImg', function(req, res){
       //   threshold: 120
       // };
       
-//       // potrace test https://github.com/tooolbox/node-potrace#readme
-//       potrace.trace(path, function(err, svg){
-//         if(err) throw err;
-//         console.log(`svg: ${svg}`);
-//         // return svg
-//         res.send(svg);
+      // potrace test https://github.com/tooolbox/node-potrace#readme
+      potrace.trace(path, function(err, svg){
+        if(err) throw err;
+        console.log(`svg: ${svg}`);
+        // return svg
+        res.send(svg);
          
-//         cleanupCallback(); 
-//       });
-      
-      var outPath = 'tmp/out.svg';
-      
-      autotrace(path, {
-        outputFile: outPath
-      }, function(err, buffer) {
-        if (!err) console.log('done');
+        cleanupCallback(); 
       });
+      
+//       var outPath = 'tmp/out.svg';
+      
+//       autotrace(path, {
+//         outputFile: outPath
+//       }, function(err, buffer) {
+//         if (!err) console.log('done');
+//       });
   });
   });
   }

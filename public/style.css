@@ -23,6 +23,10 @@ p {
   max-width: 600px;
 }
 
+img{
+  width: 250px;
+}
+
 form {
   margin-bottom: 25px;
   padding: 15px;

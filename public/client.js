@@ -10,9 +10,10 @@ function uploadImage(){
     var formData = new FormData();
     formData.append('file', $('#imgFile')[0].files[0]);
     
+    // run potrace on image
      $.ajax({
             type: 'POST',
-            url: '/convertImg',
+            url: '/potraceImg',
             data: formData,
             contentType: false,
             processData: false,
@@ -20,9 +21,11 @@ function uploadImage(){
             cache: false,
             success: function(data){
               console.log(data);
-              // show SVG on page
+              $('#potrace').append(data);
           }
         });
+    
+    // run autotrace?
     
   }else{
     window.alert("Please upload a bitmap image (png, jpg, bmp)");

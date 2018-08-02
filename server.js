@@ -10,11 +10,15 @@ var fs = require('fs');
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
 
+var ImageTracer = require('imagetracerjs');
+
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
+
+app.use(fileUpload());
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', function(request, response) {
@@ -26,35 +30,32 @@ var listener = app.listen(process.env.PORT, function() {
   console.log('Your app is listening on port ' + listener.address().port);
 });
 
-app.POST('/convertImg', function(req, res){
+app.post('/convertImg', function(req, res){
   if(!req.files) console.log('no files uploaded')
   else{
     let imgFile = req.files.file;
     let imgName = imgFile.name;
     console.log(`imgName: ${imgName}`);
-    let imgType = imgFile.ext;
+    let imgType = imgName.substring(imgName.indexOf('.')+1);
+    console.log(`imgType: ${imgType}`);
     
-//     tmp.file({postfix: imgType, keep: false, dir: "tmp"}, function _tempFileCreated(err, path, fd, cleanupCallback) {
-//     if (err) throw err;
-//     fs.writeFile(path, stlFile.data, function(err){
-//       console.log('wrote to file!');
+    tmp.file({postfix: imgType, keep: false, dir: "tmp"}, function _tempFileCreated(err, path, fd, cleanupCallback) {
+    if (err) throw err;
+    fs.writeFile(path, imgFile.data, function(err){
+      console.log('wrote to file!');
       
-//       // console.log('File: ', path);
-//       // console.log('Filedescriptor: ', fd);
-//       // console.log(`FileName: ${fontName}`);
+      // convert to svg
+      ImageTracer.imageToSVG(path, alert);
+     
 
-//       let stl = NodeSTL(path);
-//       let boundingBox = stl.boundingBox; // in millimeters
-//       console.log(stl.boundingBox);  
-//       // convert to inches
-//       boundingBox = boundingBox.map(function(x) {return x * 0.0393701});      
-
-//       cleanupCallback();
-//       // return font name
-      
-//       res.send(boundingBox);
-//   });
-//   });
+      cleanupCallback();
+      // return font name
+      // res.send(svg);
+  });
+  });
   }
   
 });
+
+function alert(){
+}

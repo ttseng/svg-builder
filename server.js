@@ -45,10 +45,10 @@ app.post('/convertImg', function(req, res){
     fs.writeFile(path, imgFile.data, function(err){
       console.log('wrote to file!');
       
-      // convert to svg
-      var params = {
-        threshold: 120
-      };
+      // // convert to svg
+      // var params = {
+      //   threshold: 120
+      // };
       
 //       // potrace test https://github.com/tooolbox/node-potrace#readme
 //       potrace.trace(path, function(err, svg){
@@ -62,7 +62,9 @@ app.post('/convertImg', function(req, res){
       
       // autotrace test https://www.npmjs.com/package/autotrace
       autotrace(path).outputFormat('svg').stream(function(err, stdout, stderr){
+        if(err) throw err;
         var writeStream = fs.createWriteStream('tmp/out.svg');
+        stdout.pipe(writeStream);
         
         console.log(`stdout ${stdout}`);
         // res.send(stdout);

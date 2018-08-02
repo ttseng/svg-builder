@@ -12,6 +12,7 @@ const fileUpload = require('express-fileupload');
 
 var potrace = require('potrace');
 var autotrace = require('autotrace');
+const read = require('svg-reader');
 
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
@@ -60,19 +61,14 @@ app.post('/convertImg', function(req, res){
 //         cleanupCallback(); 
 //       });
       
-      // autotrace test https://www.npmjs.com/package/autotrace
-      autotrace(path).outputFormat('svg').stream(function(err, stdout, stderr){
-        if(err) throw err;
-        var writeStream = fs.createWriteStream('tmp/out.svg');
-        stdout.pipe(writeStream);
-        
-        console.log(`stdout ${stdout}`);
-        // res.send(stdout);
-         
-        cleanupCallback(); 
+      var outPath = 'tmp/out.svg';
+      
+      autotrace(path, {
+        outputFile: outPath
+      }, function(err, buffer) {
+        if (!err) console.log('done');
       });
   });
   });
   }
-  
 });

@@ -16,7 +16,8 @@
     "body-parser": "^1.18.3",
     "express-fileupload": "^0.4.0",
     "potrace": "^2.1.1",
-    "autotrace": "^0.0.2"
+    "autotrace": "^0.0.2",
+    "svg-reader": "^0.2.0"
   },
   "engines": {
     "node": "8.x"

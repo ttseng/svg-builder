@@ -48,7 +48,7 @@ app.post('/potraceImg', function(req, res){
       
       // // convert to svg
       var params = {
-        turdSize: 15
+        turdSize: 25
       };
       
       // potrace test https://github.com/tooolbox/node-potrace#readme

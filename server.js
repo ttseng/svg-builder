@@ -46,19 +46,37 @@ app.post('/potraceImg', function(req, res){
     fs.writeFile(path, imgFile.data, function(err){
       console.log('wrote to file!');
       
-      // // convert to svg
-      var params = {
+      var outputs = {};
+      
+      var orig_params = {};
+      
+      var cut_params = {
         turdSize: 25
       };
       
+      // // convert to svg
+    
+      
+      // first create original path
       // potrace test https://github.com/tooolbox/node-potrace#readme
-      potrace.trace(path, params, function(err, svg){
+      potrace.trace(path, orig_params, function(err, fullSVG){
         if(err) throw err;
-        console.log(`svg: ${svg}`);
-        // return svg
-        res.send(svg);
+        console.log(`fullSVG: ${fullSVG}`);
+        outputs.full = fullSVG;
+        
+        // next, create cut paths only
+        potrace.trace(path, cut_params, function(err, cutSVG){
+          if(err) throw err;
+          outputs.cut = cutSVG;         
+          
+          // now take the diff
+          
+          // return svg
+          res.send(outputs);
          
-        cleanupCallback(); 
+          cleanupCallback(); 
+        });
+        
       });
       
 //       var outPath = 'tmp/out.svg';

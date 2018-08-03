@@ -21,8 +21,8 @@ function uploadImage(){
             cache: false,
             success: function(data){
               console.log(data);
-              $('#potraceOutput').empty();
-              $('#potraceOutput').append(data);
+              $('#potraceOutput .full').html(data.full);
+              $('#potraceOutput .cut').html(data.cut);
           }
         });
     

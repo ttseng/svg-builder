@@ -47,12 +47,12 @@ app.post('/potraceImg', function(req, res){
       console.log('wrote to file!');
       
       // // convert to svg
-      // var params = {
-      //   threshold: 120
-      // };
+      var params = {
+        turdSize: 15
+      };
       
       // potrace test https://github.com/tooolbox/node-potrace#readme
-      potrace.trace(path, function(err, svg){
+      potrace.trace(path, params, function(err, svg){
         if(err) throw err;
         console.log(`svg: ${svg}`);
         // return svg

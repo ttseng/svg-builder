@@ -142,59 +142,16 @@ function getScoreSVG(full, cut){
 // create polygon path from an SVG path to use with clipper.js
 function createPath(svgPathD){
   var paths = new ClipperLib.Paths();
-
-  // split svgPathD into arrays based on closed paths
-  var indexes = getAllIndexes(svgPathD, "M");
-  // console.log(`indexes: ${JSON.stringify(indexes)}`);
-
-  var newSVGpathsD = [];
-
-  for(i=0; i<indexes.length; i++){
-    var subPath = "";
-    if(i == 0){
-      // console.log('first index');
-      subPath = svgPathD.substring(i, indexes[i+1]);
-    }else if(i == indexes.length-1){
-      // last path
-      // console.log('last index');
-      subPath = svgPathD.substring(indexes[i]);
-    }else{
-      // console.log(`substring ${indexes[i]} to ${indexes[i+1]}`);
-      subPath = svgPathD.substring(indexes[i], indexes[i+1]);
-    }
-
-    // console.log(`${i} subPath with length ${subPath.length} : ${subPath}`);
-    // console.log(`----------------------`);
-    newSVGpathsD.push(subPath);
-  }
-
-  // console.log(`newSVGpathsD: ${JSON.stringify(newSVGpathsD)}`);
-
-  for(var x=0; x<newSVGpathsD.length; x++){
-    // console.log(`path creation loop ${x}`);
-    var path = new ClipperLib.Path();
-    
-    // var properties = pathProperties.svgPathProperties(newSVGpathsD[x]);
-    // var len = Math.round(properties.getTotalLength());
-    var pts = point(newSVGpathsD[x]);
-    var len = Math.round(pts.length());
-
-    // console.log(`path length ${len}`);
+  var path = new ClipperLib.Path();
+  var pts = point(svgPathD);
+  var len = Math.round(pts.length());
   
-    for(var i=0; i<len; i++){
+  for(var i=0; i<len; i++){
       var p = pts.at(i);
-      // var p = properties.getPointAtLength(i);
-      // console.log(`${i} p ${JSON.stringify(p)}`);
-      // path.push(new ClipperLib.IntPoint(p.x, p.y));
+    console.log(`${i} with p ${p[0]} ${p[1]}`);
       path.push(new ClipperLib.IntPoint(p[0], p[1]));
     }
-    // console.log(`path: ${JSON.stringify(path)}`);
-    // console.log('');
-    // add this array to paths
     paths.push(path);
-  }
-
-  // console.log(`paths: ${JSON.stringify(paths)}`);
 
   return paths;
 }

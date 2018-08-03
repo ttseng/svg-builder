@@ -14,6 +14,11 @@ var potrace = require('potrace');
 var autotrace = require('autotrace');
 const read = require('svg-reader');
 
+const ClipperLib = require('clipper-lib');
+var point = require('point-at-length');
+
+var scale = 100;
+
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
 
@@ -61,7 +66,6 @@ app.post('/potraceImg', function(req, res){
       // potrace test https://github.com/tooolbox/node-potrace#readme
       potrace.trace(path, orig_params, function(err, fullSVG){
         if(err) throw err;
-        console.log(`fullSVG: ${fullSVG}`);
         outputs.full = fullSVG;
         
         // next, create cut paths only
@@ -70,6 +74,8 @@ app.post('/potraceImg', function(req, res){
           outputs.cut = cutSVG;         
           
           // now take the diff
+          var scoreSVG = getScoreSVG(outputs.full, outputs.cut);
+          outputs.scoreSVG = scoreSVG;
           
           // return svg
           res.send(outputs);
@@ -90,3 +96,142 @@ app.post('/potraceImg', function(req, res){
   });
   }
 });
+
+// takes the difference between the full svg and cut svg to get just the score lines
+function getScoreSVG(full, cut){
+  var width = 700;
+  var height = 700; // for now hardcode dimensions
+  console.log(`full: ${full}`);
+  console.log('');
+  console.log(`cut: ${cut}`);
+  var subjPaths = createPath(full);
+  console.log('got subject paths');
+  var clipPaths = createPath(cut);
+  console.log('got clip paths');
+  
+  var clipOutput = {}; // store clip information
+  ClipperLib.JS.ScaleUpPaths(subjPaths, scale);
+  ClipperLib.JS.ScaleUpPaths(clipPaths, scale);
+  var cpr = new ClipperLib.Clipper();
+  cpr.AddPaths(subjPaths, ClipperLib.PolyType.ptSubject, true);
+  cpr.AddPaths(clipPaths, ClipperLib.PolyType.ptClip, true);
+  var subject_fillType = ClipperLib.PolyFillType.pftNonZero;
+  var clip_fillType = ClipperLib.PolyFillType.pftNonZero;
+  var clipTypes = [ClipperLib.ClipType.ctUnion, ClipperLib.ClipType.ctDifference, ClipperLib.ClipType.ctXor, ClipperLib.ClipType.ctIntersection];
+  var clipTypesString = ["union", "difference", "xor", "intersection"];
+  var solution_paths = new ClipperLib.Paths();
+  
+  for(var i = 0; i < clipTypes.length; i++) {
+    solution_paths = new ClipperLib.Paths();
+    cpr.Execute(clipTypes[i], solution_paths, subject_fillType, clip_fillType);
+    // console.log(JSON.stringify(solution_paths));
+    
+    var newSVGPathD = paths2string(solution_paths, scale);  
+    console.log(`newSVGPathD: ${newSVGPathD}`);
+    
+    var newSVG = svgFromPath(newSVGPathD, width, height);
+    console.log(`newSVG: ${newSVG}`);
+    
+    clipOutput[clipTypesString[i]] = newSVG;
+  }
+  console.log(`clipOutput: ${JSON.stringify(clipOutput)}`);
+  return clipOutput;
+}
+
+// createPath 
+// create polygon path from an SVG path to use with clipper.js
+function createPath(svgPathD){
+  var paths = new ClipperLib.Paths();
+
+  // split svgPathD into arrays based on closed paths
+  var indexes = getAllIndexes(svgPathD, "M");
+  // console.log(`indexes: ${JSON.stringify(indexes)}`);
+
+  var newSVGpathsD = [];
+
+  for(i=0; i<indexes.length; i++){
+    var subPath = "";
+    if(i == 0){
+      // console.log('first index');
+      subPath = svgPathD.substring(i, indexes[i+1]);
+    }else if(i == indexes.length-1){
+      // last path
+      // console.log('last index');
+      subPath = svgPathD.substring(indexes[i]);
+    }else{
+      // console.log(`substring ${indexes[i]} to ${indexes[i+1]}`);
+      subPath = svgPathD.substring(indexes[i], indexes[i+1]);
+    }
+
+    // console.log(`${i} subPath with length ${subPath.length} : ${subPath}`);
+    // console.log(`----------------------`);
+    newSVGpathsD.push(subPath);
+  }
+
+  // console.log(`newSVGpathsD: ${JSON.stringify(newSVGpathsD)}`);
+
+  for(var x=0; x<newSVGpathsD.length; x++){
+    // console.log(`path creation loop ${x}`);
+    var path = new ClipperLib.Path();
+    
+    // var properties = pathProperties.svgPathProperties(newSVGpathsD[x]);
+    // var len = Math.round(properties.getTotalLength());
+    var pts = point(newSVGpathsD[x]);
+    var len = Math.round(pts.length());
+
+    // console.log(`path length ${len}`);
+  
+    for(var i=0; i<len; i++){
+      var p = pts.at(i);
+      // var p = properties.getPointAtLength(i);
+      // console.log(`${i} p ${JSON.stringify(p)}`);
+      // path.push(new ClipperLib.IntPoint(p.x, p.y));
+      path.push(new ClipperLib.IntPoint(p[0], p[1]));
+    }
+    // console.log(`path: ${JSON.stringify(path)}`);
+    // console.log('');
+    // add this array to paths
+    paths.push(path);
+  }
+
+  // console.log(`paths: ${JSON.stringify(paths)}`);
+
+  return paths;
+}
+
+// path2strings
+// takes paths from clipper.js and converts them to svg paths
+function paths2string (paths, scale) {
+  var svgpath = "", i, j;
+  if (!scale) scale = 1;
+  for(i = 0; i < paths.length; i++) {
+    for(j = 0; j < paths[i].length; j++){
+      if (!j) svgpath += "M";
+      else svgpath += "L";
+      svgpath += (paths[i][j].X / scale) + ", " + (paths[i][j].Y / scale);
+    }
+    svgpath += "Z";
+  }
+  // if (svgpath=="") svgpath = "M0,0";
+  return svgpath;
+}
+
+// svgFromPath(path)
+// create an SVG from a given path
+function svgFromPath(path, width, height){
+  var svg = `<svg style="background-color:#e7e7e7" width=${width} height=${height}>`;
+  svg += '<path stroke="black" fill="yellow" stroke-width="2" d="' + path + '"/>';
+  svg += '</svg>';
+  return svg;
+}
+
+// getAllIndexes
+// find indexes of all occurences of val within a string
+function getAllIndexes(arr, val) {
+    var indexes = [], i;
+    for(i = 0; i < arr.length; i++)
+        if (arr[i] === val)
+            indexes.push(i);
+    return indexes;
+}
+

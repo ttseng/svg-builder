@@ -17,7 +17,9 @@
     "express-fileupload": "^0.4.0",
     "potrace": "^2.1.1",
     "autotrace": "^0.0.2",
-    "svg-reader": "^0.2.0"
+    "svg-reader": "^0.2.0",
+    "clipper-lib": "^6.2.1",
+    "point-at-length": "^1.1.0"
   },
   "engines": {
     "node": "8.x"

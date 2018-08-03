@@ -23,6 +23,7 @@ function uploadImage(){
               console.log(data);
               $('#potraceOutput .full').html(data.full);
               $('#potraceOutput .cut').html(data.cut);
+              $('#potraceOutput .score').html(data.score);
           }
         });
     

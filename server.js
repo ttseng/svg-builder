@@ -74,6 +74,9 @@ app.post('/potraceImg', function(req, res){
           var scoreSVG = getScoreSVG(outputs.full, outputs.cut);
           outputs.score = scoreSVG;
           
+          // now compile
+          var compiledPaths = 
+          
           // return svg
           res.send(outputs);
          

@@ -21,9 +21,14 @@ function uploadImage(){
             cache: false,
             success: function(data){
               console.log(data);
-              $('#potraceOutput .full .container').html(data.full).fadeIn();
-              $('#potraceOutput .cut .container').html(data.cut).fadeIn();
+              $('#potraceOutput .full .container').html(data.full);
+              $('#potraceOutput .cut .container').html(data.cut);
               $('#potraceOutput .score .container').html(data.score);
+              $('#potraceOutput .compiled .container').html(data.compiled);
+              
+              // compile svgs
+              // var compiledSVG = compileSVG();
+              // $('#potraceOutput .compiled .contianer').html(compiledSVG).fadeIN();
           }
         });
     
@@ -34,6 +39,26 @@ function uploadImage(){
     $('#imgFile').val('');
   }
   
+}
+
+// compileSVG()
+// combines cut and score paths into a single SVG
+function compileSVG(){
+  var width = $('svg').first()[0].getAttribute('width');
+  var height = $('svg').first()[0].getAttribute('height');
+  var cutPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  cutPath.setAttribute('d', $('.cut svg').find('path')[0].getAttribute('d'));
+  cutPath.setAttribute('class', 'cut');
+  
+  var scorePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  cutPath.setAttribute('d', $('.score svg').find('path')[0].getAttribute('d'));
+  cutPath.setAttribute('class', 'score');
+  
+  var svg = `<svg width=${width} height=${height}>`;
+  svg += cutPath;
+  svg += scorePath;
+  svg += '</svg>';
+  return svg;
 }
 
 // ImageTracer.imageToSVG(

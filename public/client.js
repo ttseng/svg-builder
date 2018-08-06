@@ -21,9 +21,9 @@ function uploadImage(){
             cache: false,
             success: function(data){
               console.log(data);
-              $('#potraceOutput .full').html(data.full);
-              $('#potraceOutput .cut').html(data.cut);
-              $('#potraceOutput .score').html(data.score);
+              $('#potraceOutput .full .container').html(data.full).fadeIn();
+              $('#potraceOutput .cut .container').html(data.cut).fadeIn();
+              $('#potraceOutput .score .container').html(data.score);
           }
         });
     

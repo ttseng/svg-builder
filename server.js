@@ -15,7 +15,7 @@ var autotrace = require('autotrace');
 const read = require('svg-reader');
 const ClipperLib = require('clipper-lib');
 var point = require('point-at-length');
-var DOMParser = require('xmldom');
+var DOMParser = require('xmldom').DOMParser;
 
 var scale = 100;
 
@@ -71,8 +71,8 @@ app.post('/potraceImg', function(req, res){
           outputs.cut = cutSVG;         
           
           // now take the diff
-          // var scoreSVG = getScoreSVG(outputs.full, outputs.cut);
-          // outputs.scoreSVG = scoreSVG;
+          var scoreSVG = getScoreSVG(outputs.full, outputs.cut);
+          outputs.score = scoreSVG;
           
           // return svg
           res.send(outputs);
@@ -99,23 +99,21 @@ function getScoreSVG(full, cut){
   var width = 700;
   var height = 700; // for now hardcode dimensions to 700x700 - in future, detect from svg dimensions
   
-  console.log(`full: ${full}`);
-  console.log('');
-  console.log(`cut: ${cut}`);
+  // console.log(`full: ${full}`);
+  // console.log('');
+  // console.log(`cut: ${cut}`);
   
   // grab d element from path
   var subjElem = new DOMParser().parseFromString(full, 'text/svg');
-  var subjD = subjElem.find('path d')[0];
-  console.log(`subjD: ${subjD}`);
-  var clipElem = new DomParser().parseFromString(cut, 'text/svg');
-  var clipD = clipElem.find('path d')[0];
+  var subjD = subjElem.getElementsByTagName('path')[0].getAttribute('d'); // get path d
+  var clipElem = new DOMParser().parseFromString(cut, 'text/svg');
+  var clipD = clipElem.getElementsByTagName('path')[0].getAttribute('d')
   
   var subjPaths = createPath(subjD);
-  console.log('got subject paths');
+  // console.log('got subject paths');
   var clipPaths = createPath(clipD);
-  console.log('got clip paths');
+  // console.log('got clip paths');
   
-  var clipOutput = {}; // store clip information
   ClipperLib.JS.ScaleUpPaths(subjPaths, scale);
   ClipperLib.JS.ScaleUpPaths(clipPaths, scale);
   var cpr = new ClipperLib.Clipper();
@@ -124,24 +122,20 @@ function getScoreSVG(full, cut){
   var subject_fillType = ClipperLib.PolyFillType.pftNonZero;
   var clip_fillType = ClipperLib.PolyFillType.pftNonZero;
   var clipTypes = [ClipperLib.ClipType.ctUnion, ClipperLib.ClipType.ctDifference, ClipperLib.ClipType.ctXor, ClipperLib.ClipType.ctIntersection];
-  var clipTypesString = ["union", "difference", "xor", "intersection"];
+  var clipType = ClipperLib.ClipType.ctDifference;
   var solution_paths = new ClipperLib.Paths();
   
-  for(var i = 0; i < clipTypes.length; i++) {
-    solution_paths = new ClipperLib.Paths();
-    cpr.Execute(clipTypes[i], solution_paths, subject_fillType, clip_fillType);
-    // console.log(JSON.stringify(solution_paths));
+  solution_paths = new ClipperLib.Paths();
+  cpr.Execute(clipType, solution_paths, subject_fillType, clip_fillType);
+  // console.log(JSON.stringify(solution_paths));
+
+  var newSVGPathD = paths2string(solution_paths, scale);  
+  console.log(`newSVGPathD: ${newSVGPathD}`);
+
+  var newSVG = svgFromPath(newSVGPathD, width, height);
+  console.log(`newSVG: ${newSVG}`);
     
-    var newSVGPathD = paths2string(solution_paths, scale);  
-    console.log(`newSVGPathD: ${newSVGPathD}`);
-    
-    var newSVG = svgFromPath(newSVGPathD, width, height);
-    console.log(`newSVG: ${newSVG}`);
-    
-    clipOutput[clipTypesString[i]] = newSVG;
-  }
-  console.log(`clipOutput: ${JSON.stringify(clipOutput)}`);
-  return clipOutput;
+  return newSVG;
 }
 
 // createPath 
@@ -154,7 +148,7 @@ function createPath(svgPathD){
   
   for(var i=0; i<len; i++){
       var p = pts.at(i);
-    console.log(`${i} with p ${p[0]} ${p[1]}`);
+    // console.log(`${i} with p ${p[0]} ${p[1]}`);
       path.push(new ClipperLib.IntPoint(p[0], p[1]));
     }
     paths.push(path);

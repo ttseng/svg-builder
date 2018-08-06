@@ -75,7 +75,17 @@ app.post('/potraceImg', function(req, res){
           outputs.score = scoreSVG;
           
           // now compile
-          var compiledPaths = 
+          var cutSVG = new DOMParser().parseFromString(cutSVG, 'text/svg');
+          var scoreSVG + 
+          var cutPaths = cutSVG.getElementsByTagName('path');
+          var scorePaths = new DOMParser().parseFromString(scoreSVG, 'text/svg').getElementsByTagName('path');
+          var paths = cutPaths + scorePaths;
+          
+          var width = new DOMParser().parseFromString(cutSVG, 'text/svg').getElementsByTagName('svg')[0].getAttribute('width');
+          var height = new DOMParser().parseFromString(cutSVG, 'text/svg')[0].getAttribute('height');
+          var compiledSVG = svgFromPath(paths, width, height);
+          console.log(`compiledSVG: ${compiledSVG}`);
+          outputs.compiled = compiledSVG;
           
           // return svg
           res.send(outputs);
@@ -99,18 +109,19 @@ app.post('/potraceImg', function(req, res){
 
 // takes the difference between the full svg and cut svg to get just the score lines
 function getScoreSVG(full, cut){
-  var width = 700;
-  var height = 700; // for now hardcode dimensions to 700x700 - in future, detect from svg dimensions
+  var subj = new DOMParser().parseFromString(full, 'text/svg');
+  var clip = new DOMParser().parseFromString(cut, 'text/svg');
+  
+  var width = subj.getElementsByTagName('svg')[0].getAttribute('width');
+  var height = subj.getElementsByTagName('svg')[0].getAttribute('height');
   
   // console.log(`full: ${full}`);
   // console.log('');
   // console.log(`cut: ${cut}`);
   
   // grab d element from path
-  var subjElem = new DOMParser().parseFromString(full, 'text/svg');
-  var subjD = subjElem.getElementsByTagName('path')[0].getAttribute('d'); // get path d
-  var clipElem = new DOMParser().parseFromString(cut, 'text/svg');
-  var clipD = clipElem.getElementsByTagName('path')[0].getAttribute('d')
+  var subjD = subj.getElementsByTagName('path')[0].getAttribute('d'); // get path d
+  var clipD = clip.getElementsByTagName('path')[0].getAttribute('d');
   
   var subjPaths = createPath(subjD);
   // console.log('got subject paths');

@@ -19,7 +19,8 @@
     "autotrace": "^0.0.2",
     "svg-reader": "^0.2.0",
     "clipper-lib": "^6.2.1",
-    "point-at-length": "^1.1.0"
+    "point-at-length": "^1.1.0",
+    "xmldom": "^0.1.27"
   },
   "engines": {
     "node": "8.x"

@@ -13,9 +13,9 @@ const fileUpload = require('express-fileupload');
 var potrace = require('potrace');
 var autotrace = require('autotrace');
 const read = require('svg-reader');
-
 const ClipperLib = require('clipper-lib');
 var point = require('point-at-length');
+var DOMParser = require('xmldom');
 
 var scale = 100;
 
@@ -43,14 +43,12 @@ app.post('/potraceImg', function(req, res){
     let imgFile = req.files.file;
     let imgName = imgFile.name;
     console.log(`imgName: ${imgName}`);
-    let imgType = imgName.substring(imgName.indexOf('.')+1);
+    let imgType = imgName.substring(imgName.indexOf('.'));
     console.log(`imgType: ${imgType}`);
     
     tmp.file({postfix: imgType, keep: false, dir: "tmp"}, function _tempFileCreated(err, path, fd, cleanupCallback) {
     if (err) throw err;
-    fs.writeFile(path, imgFile.data, function(err){
-      console.log('wrote to file!');
-      
+    fs.writeFile(path, imgFile.data, function(err){      
       var outputs = {};
       
       var orig_params = {};
@@ -60,7 +58,6 @@ app.post('/potraceImg', function(req, res){
       };
       
       // // convert to svg
-    
       
       // first create original path
       // potrace test https://github.com/tooolbox/node-potrace#readme
@@ -74,8 +71,8 @@ app.post('/potraceImg', function(req, res){
           outputs.cut = cutSVG;         
           
           // now take the diff
-          var scoreSVG = getScoreSVG(outputs.full, outputs.cut);
-          outputs.scoreSVG = scoreSVG;
+          // var scoreSVG = getScoreSVG(outputs.full, outputs.cut);
+          // outputs.scoreSVG = scoreSVG;
           
           // return svg
           res.send(outputs);
@@ -100,13 +97,22 @@ app.post('/potraceImg', function(req, res){
 // takes the difference between the full svg and cut svg to get just the score lines
 function getScoreSVG(full, cut){
   var width = 700;
-  var height = 700; // for now hardcode dimensions
+  var height = 700; // for now hardcode dimensions to 700x700 - in future, detect from svg dimensions
+  
   console.log(`full: ${full}`);
   console.log('');
   console.log(`cut: ${cut}`);
-  var subjPaths = createPath(full);
+  
+  // grab d element from path
+  var subjElem = new DOMParser().parseFromString(full, 'text/svg');
+  var subjD = subjElem.find('path d')[0];
+  console.log(`subjD: ${subjD}`);
+  var clipElem = new DomParser().parseFromString(cut, 'text/svg');
+  var clipD = clipElem.find('path d')[0];
+  
+  var subjPaths = createPath(subjD);
   console.log('got subject paths');
-  var clipPaths = createPath(cut);
+  var clipPaths = createPath(clipD);
   console.log('got clip paths');
   
   var clipOutput = {}; // store clip information

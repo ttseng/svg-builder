@@ -9,6 +9,7 @@ dependencies:
   potrace: 2.1.1
   svg-reader: 0.2.0
   tmp: 0.0.33
+  xmldom: 0.1.27
 packages:
   /abab/1.0.4:
     dev: false
@@ -1412,6 +1413,12 @@ packages:
       node: '>=4.0'
     resolution:
       integrity: sha1-Ey7mPS7FVlxVfiD0wi35rKaGsQ0=
+  /xmldom/0.1.27:
+    dev: false
+    engines:
+      node: '>=0.1'
+    resolution:
+      integrity: sha1-1QH5ezvbQDr4757MIFcxh6rawOk=
   /xtend/4.0.1:
     dev: false
     engines:
@@ -1432,3 +1439,4 @@ specifiers:
   potrace: ^2.1.1
   svg-reader: ^0.2.0
   tmp: ^0.0.33
+  xmldom: ^0.1.27

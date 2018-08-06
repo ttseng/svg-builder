@@ -76,14 +76,19 @@ app.post('/potraceImg', function(req, res){
           
           // now compile
           var cutSVG = new DOMParser().parseFromString(cutSVG, 'text/svg');
-          var scoreSVG + 
-          var cutPaths = cutSVG.getElementsByTagName('path');
-          var scorePaths = new DOMParser().parseFromString(scoreSVG, 'text/svg').getElementsByTagName('path');
-          var paths = cutPaths + scorePaths;
+          var scoreSVG = new DOMParser().parseFromString(scoreSVG, 'text/svg')
           
-          var width = new DOMParser().parseFromString(cutSVG, 'text/svg').getElementsByTagName('svg')[0].getAttribute('width');
-          var height = new DOMParser().parseFromString(cutSVG, 'text/svg')[0].getAttribute('height');
-          var compiledSVG = svgFromPath(paths, width, height);
+          var cutPath = cutSVG.getElementsByTagName('path')[0];
+          var scorePath = scoreSVG.getElementsByTagName('path')[0];
+          
+          var width = cutSVG.getElementsByTagName('svg')[0].getAttribute('width');
+          var height = cutSVG.getElementsByTagName('svg')[0].getAttribute('height');
+          
+          var compiledSVG = `<svg width=${width} height=${height} viewBox="0 0 ${width} ${height}">`;
+          compiledSVG += cutPath;
+          compiledSVG += scorePath;
+          compiledSVG += '</svg>';
+  
           console.log(`compiledSVG: ${compiledSVG}`);
           outputs.compiled = compiledSVG;
           
@@ -232,7 +237,7 @@ function paths2string (paths, scale) {
 // svgFromPath(path)
 // create an SVG from a given path
 function svgFromPath(path, width, height){
-  var svg = `<svg width=${width} height=${height}>`;
+  var svg = `<svg width=${width} height=${height} viewBox="0 0 ${width} ${height}">`;
   svg += '<path stroke="black" fill="yellow" stroke-width="2" d="' + path + '"/>';
   svg += '</svg>';
   return svg;
